@@ -60,6 +60,8 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   }
 
   // Mint one furniture
+  //TODO: Require before status overwrite
+  //TODO: Do you want decimal furnitures? Testing github edit 
   function mintFurniture(uint256 id, uint256 amount) public payable {
     _furnitures[id].totalSupply += amount;
 
