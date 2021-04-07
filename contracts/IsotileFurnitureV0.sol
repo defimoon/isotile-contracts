@@ -90,5 +90,9 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
     _mintBatch(msg.sender, ids, amounts, "");
   }
 
+  function withdraw() onlyOwner public {
+    uint balance = address(this).balance;
+    payable(msg.sender).transfer(balance);
+  }
 
 }
