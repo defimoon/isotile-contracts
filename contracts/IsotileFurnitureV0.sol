@@ -58,8 +58,6 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   }
 
   // Mint one furniture
-  //TODO: Require before status overwrite
-  //TODO: Do you want decimal furnitures? Testing github edit 
   function mintFurniture(uint256 id, uint256 amount) public payable {
     require(amount > 0, "amount cannot be 0");
 
@@ -114,7 +112,7 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   }
 
   // Create a furniture
-  function addFurniture(string memory _globalUri, uint256 _maxSupply, bool _isPaidOnTiles, uint256 _price) public onlyOwner {
+  function addFurniture(string memory _globalUri, uint256 _maxSupply, bool _isPaidOnTiles, uint256 _price) onlyOwner public {
     uint256 newFurnitureId = _furnitureIds.current();
 
     _furnitures[newFurnitureId].uri = _globalUri;
