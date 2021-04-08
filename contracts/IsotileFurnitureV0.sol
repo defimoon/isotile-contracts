@@ -16,7 +16,7 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   struct Furniture {
     string uri;
     uint256 maxSupply;
-    bool isPaidOnTiles;
+    bool isPaidWithEther;
     uint256 price;
     uint256 totalSupply;
   }
@@ -43,8 +43,8 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   }
 
   // Get if a furniture is paid on tiles
-  function isPaidOnTiles(uint256 id) public view returns (bool){
-    return _furnitures[id].isPaidOnTiles;
+  function isPaidWithEther(uint256 id) public view returns (bool){
+    return _furnitures[id].isPaidWithEther;
   }
 
   // Get price in weis of furniture ID
@@ -65,13 +65,13 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
     require(_furnitures[id].totalSupply <= _furnitures[id].maxSupply, "Exceeds MAX_SUPPLY");
 
     uint256 paymentRequired = _furnitures[id].price * amount;
-    if(_furnitures[id].isPaidOnTiles){
+    if(_furnitures[id].isPaidWithEther){
+      require(msg.value == paymentRequired, "Ether value sent is not correct");
+    }else{
       require(msg.value == 0, "Ether not accepted for this furniture");
       require(tilesInstance.balanceOf(msg.sender) >= paymentRequired, "Not enough tiles");
 
       tilesInstance.burnFrom(msg.sender, paymentRequired);
-    }else{
-      require(msg.value == paymentRequired, "Ether value sent is not correct");
     }
 
     _mint(msg.sender, id, amount, "");
@@ -93,10 +93,10 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
       _furnitures[id].totalSupply += amount;
       require(_furnitures[id].totalSupply <= _furnitures[id].maxSupply, "Exceeds MAX_SUPPLY");
 
-      if(_furnitures[id].isPaidOnTiles){
-        paymentRequiredOnTiles += _furnitures[id].price * amount;
-      }else{
+      if(_furnitures[id].isPaidWithEther){
         paymentRequiredOnEther += _furnitures[id].price * amount;
+      }else{
+        paymentRequiredOnTiles += _furnitures[id].price * amount;
       }
     }
 
@@ -112,14 +112,16 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   }
 
   // Create a furniture
-  function addFurniture(string memory _globalUri, uint256 _maxSupply, bool _isPaidOnTiles, uint256 _price) onlyOwner public {
+  function addFurniture(string memory _furnitureUri, uint256 _maxSupply, bool _isPaidWithEther, uint256 _price) onlyOwner public {
     uint256 newFurnitureId = _furnitureIds.current();
 
-    _furnitures[newFurnitureId].uri = _globalUri;
-    _furnitures[newFurnitureId].maxSupply = _maxSupply;
-    _furnitures[newFurnitureId].isPaidOnTiles = _isPaidOnTiles;
-    _furnitures[newFurnitureId].price = _price;
-    _furnitures[newFurnitureId].totalSupply = 0;
+    _furnitures[newFurnitureId] = Furniture({
+      uri: _furnitureUri,
+      maxSupply: _maxSupply,
+      isPaidWithEther: _isPaidWithEther,
+      price: _price,
+      totalSupply: 0
+    });
 
     _furnitureIds.increment();
   }

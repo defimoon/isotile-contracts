@@ -2,9 +2,10 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Snapshot.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Tiles is ERC20 {
+contract Tiles is ERC20Snapshot, Ownable {
     constructor(uint256 initialSupply) ERC20("Tiles", "TIL") {
 
     }
