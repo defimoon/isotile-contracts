@@ -43,6 +43,8 @@ contract Tiles is ERC20, ERC20Snapshot, ERC20Capped, Ownable {
     }
 
     function redeemCommunityPart() public {
+        require(!communityPartRedeemed[msg.sender], "Community part already redeemed");
+
         address[] memory addresses;
         addresses[0] = msg.sender;
         addresses[1] = msg.sender;
