@@ -15,7 +15,7 @@ contract IsotileFurniture is ERC1155, ERC1155Pausable, Ownable {
   ITiles private tilesInstance;
   
   // Event on create furnitures
-  event FurnitureAdded(uint256 indexed id, string uri, uint256 maxSupply, bool isPaidWithEther, uint256 price, bool mustSaveFirstBuyer);
+  event FurnitureAdded(uint256 indexed id);
   
   // Mapping from address to count of furnitures bought
   mapping (address => uint256) private _furnituresBought;
@@ -154,7 +154,7 @@ contract IsotileFurniture is ERC1155, ERC1155Pausable, Ownable {
       mustSaveFirstBuyer: _mustSaveFirstBuyer
     });
     
-    emit FurnitureAdded(newFurnitureId, _furnitureUri, _maxSupply, _isPaidWithEther, _price, _mustSaveFirstBuyer);
+    emit FurnitureAdded(newFurnitureId);
 
     _furnitureIds.increment();
   }
