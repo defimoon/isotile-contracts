@@ -2,9 +2,9 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/utils/Arrays.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "../ERC20.sol";
+import "../../../utils/Arrays.sol";
+import "../../../utils/Counters.sol";
 
 /**
  * @dev This contract extends an ERC20 token with a snapshot mechanism. When a snapshot is created, the balances and
@@ -175,9 +175,5 @@ abstract contract ERC20Snapshot is ERC20 {
         } else {
             return ids[ids.length - 1];
         }
-    }
-
-    function getCurrentSnapshotId() public view returns (uint256) {
-        return _currentSnapshotId.current();
     }
 }

@@ -2,16 +2,23 @@
 
 pragma solidity ^0.8.0;
 
+import "./ITiles.sol";
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "./ITilesV0.sol";
+import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
-contract IsotileFurnitureV0 is ERC1155, Ownable {
+contract IsotileFurniture is ERC1155, ERC1155Pausable, Ownable {
   using Counters for Counters.Counter;
 
   Counters.Counter private _furnitureIds;
-  ITilesV0 public tilesInstance;
+  ITiles private tilesInstance;
+  
+  // Event on create furnitures
+  event FurnitureAdded(uint256 indexed id, string uri, uint256 maxSupply, bool isPaidWithEther, uint256 price, bool mustSaveFirstBuyer);
+  
+  // Mapping from address to count of furnitures bought
+  mapping (address => uint256) private _furnituresBought;
 
   struct Furniture {
     string uri;
@@ -19,6 +26,7 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
     bool isPaidWithEther;
     uint256 price;
     uint256 totalSupply;
+    bool mustSaveFirstBuyer;
   }
 
   // Mapping from furniture ID to furnitures
@@ -30,6 +38,11 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   // Get total furnitures added to isotile contract
   function getTotalFurnitures() public view returns (uint256){
     return _furnitureIds.current();
+  }
+
+  // Get total furnitures added to isotile contract
+  function getCountOfFurnituresBought(address account) public view returns (uint256){
+    return _furnituresBought[account];
   }
 
   // Override get uri for a furniture ID
@@ -71,7 +84,11 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
       require(msg.value == 0, "Ether not accepted for this furniture");
       require(tilesInstance.balanceOf(msg.sender) >= paymentRequired, "Not enough tiles");
 
-      tilesInstance.burnFromFurnitureSpending(msg.sender, paymentRequired);
+      tilesInstance.spend(msg.sender, paymentRequired);
+    }
+
+    if(_furnitures[id].mustSaveFirstBuyer){
+      _furnituresBought[msg.sender] += amount;
     }
 
     _mint(msg.sender, id, amount, "");
@@ -81,6 +98,7 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   function mintBatchFurnitures(uint256[] memory ids, uint256[] memory amounts) public payable {
     require(ids.length == amounts.length, "ERC1155: ids and amounts length mismatch");
 
+    uint256 totalAmounts = 0;
     uint256 paymentRequiredOnEther = 0;
     uint256 paymentRequiredOnTiles = 0;
 
@@ -89,6 +107,10 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
       uint256 amount = amounts[i];
 
       require(amount > 0, "amount cannot be 0");
+
+      if(_furnitures[id].mustSaveFirstBuyer){
+        totalAmounts += amount;
+      }
 
       require(_furnitures[id].totalSupply + amount <= _furnitures[id].maxSupply, "Exceeds MAX_SUPPLY");
       _furnitures[id].totalSupply += amount;
@@ -105,14 +127,22 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
     if(paymentRequiredOnTiles > 0){
       require(tilesInstance.balanceOf(msg.sender) >= paymentRequiredOnTiles, "Not enough tiles");
 
-      tilesInstance.burnFromFurnitureSpending(msg.sender, paymentRequiredOnTiles);
+      tilesInstance.spend(msg.sender, paymentRequiredOnTiles);
+    }
+
+    if(totalAmounts > 0){
+      _furnituresBought[msg.sender] += totalAmounts;
     }
 
     _mintBatch(msg.sender, ids, amounts, "");
   }
+  
+  function _beforeTokenTransfer(address operator, address from, address to, uint256[] memory ids, uint256[] memory amounts, bytes memory data) internal virtual override(ERC1155, ERC1155Pausable) {
+    super._beforeTokenTransfer(operator, from, to, ids, amounts, data);
+  }
 
   // Create a furniture
-  function addFurniture(string memory _furnitureUri, uint256 _maxSupply, bool _isPaidWithEther, uint256 _price) onlyOwner public {
+  function addFurniture(string memory _furnitureUri, uint256 _maxSupply, bool _isPaidWithEther, uint256 _price, bool _mustSaveFirstBuyer) onlyOwner public {
     uint256 newFurnitureId = _furnitureIds.current();
 
     _furnitures[newFurnitureId] = Furniture({
@@ -120,14 +150,25 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
       maxSupply: _maxSupply,
       isPaidWithEther: _isPaidWithEther,
       price: _price,
-      totalSupply: 0
+      totalSupply: 0,
+      mustSaveFirstBuyer: _mustSaveFirstBuyer
     });
+    
+    emit FurnitureAdded(newFurnitureId, _furnitureUri, _maxSupply, _isPaidWithEther, _price, _mustSaveFirstBuyer);
 
     _furnitureIds.increment();
   }
 
   function setTilesInstance(address tilesAddress) onlyOwner public {
-    tilesInstance = ITilesV0(tilesAddress);
+    tilesInstance = ITiles(tilesAddress);
+  }
+  
+  function pause() onlyOwner public {
+      _pause();
+  }
+  
+  function unpause() onlyOwner public {
+      _unpause();
   }
 
   function withdraw() onlyOwner public {
