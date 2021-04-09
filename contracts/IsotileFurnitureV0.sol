@@ -61,8 +61,8 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
   function mintFurniture(uint256 id, uint256 amount) public payable {
     require(amount > 0, "amount cannot be 0");
 
+    require(_furnitures[id].totalSupply + amount <= _furnitures[id].maxSupply, "Exceeds MAX_SUPPLY");
     _furnitures[id].totalSupply += amount;
-    require(_furnitures[id].totalSupply <= _furnitures[id].maxSupply, "Exceeds MAX_SUPPLY");
 
     uint256 paymentRequired = _furnitures[id].price * amount;
     if(_furnitures[id].isPaidWithEther){
@@ -71,7 +71,7 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
       require(msg.value == 0, "Ether not accepted for this furniture");
       require(tilesInstance.balanceOf(msg.sender) >= paymentRequired, "Not enough tiles");
 
-      tilesInstance.burnFrom(msg.sender, paymentRequired);
+      tilesInstance.burnFromFurnitureSpending(msg.sender, paymentRequired);
     }
 
     _mint(msg.sender, id, amount, "");
@@ -90,8 +90,8 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
 
       require(amount > 0, "amount cannot be 0");
 
+      require(_furnitures[id].totalSupply + amount <= _furnitures[id].maxSupply, "Exceeds MAX_SUPPLY");
       _furnitures[id].totalSupply += amount;
-      require(_furnitures[id].totalSupply <= _furnitures[id].maxSupply, "Exceeds MAX_SUPPLY");
 
       if(_furnitures[id].isPaidWithEther){
         paymentRequiredOnEther += _furnitures[id].price * amount;
@@ -105,7 +105,7 @@ contract IsotileFurnitureV0 is ERC1155, Ownable {
     if(paymentRequiredOnTiles > 0){
       require(tilesInstance.balanceOf(msg.sender) >= paymentRequiredOnTiles, "Not enough tiles");
 
-      tilesInstance.burnFrom(msg.sender, paymentRequiredOnTiles);
+      tilesInstance.burnFromFurnitureSpending(msg.sender, paymentRequiredOnTiles);
     }
 
     _mintBatch(msg.sender, ids, amounts, "");
