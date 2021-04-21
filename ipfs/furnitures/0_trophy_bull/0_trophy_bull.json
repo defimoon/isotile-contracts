@@ -1,0 +1,10 @@
+{
+  "name": "Bull Trophy",
+  "description": "It is one of the first trophies created in isotile with only 333 units in existence. It represents the uptrend of cryptocurrencies over fiat money.",
+  "image": "ipfs://QmUU8wDV54ud1xca6YsTpnPkRpRnGp6hPjMsTtPQX3ERgU",
+  "external_url": "https://isotile.com",
+  "attributes": [{
+      "trait_type": "Rarity", 
+      "value": "Megarare"
+    }]
+}

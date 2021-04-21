@@ -1,0 +1,10 @@
+{
+  "name": "Bitcoin Trophy",
+  "description": "It is one of the first trophies created in isotile with only 333 units in existence. It represents the first step to end fiat money.",
+  "image": "ipfs://QmW4HyP5yMfV9ZCemVwDYvG2Qo4cme8u7fUSWN3zffBwi1",
+  "external_url": "https://isotile.com",
+  "attributes": [{
+      "trait_type": "Rarity", 
+      "value": "Megarare"
+    }]
+}

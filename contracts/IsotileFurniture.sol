@@ -26,7 +26,7 @@ contract IsotileFurniture is ERC1155, ERC1155Pausable, Ownable {
     bool isPaidWithEther;
     uint256 price;
     uint256 totalSupply;
-    bool mustSaveFirstBuyer;
+    uint256 saveFirstBuyerMaxTimestampAllowed;
   }
 
   // Mapping from furniture ID to furnitures
@@ -87,7 +87,7 @@ contract IsotileFurniture is ERC1155, ERC1155Pausable, Ownable {
       tilesInstance.spend(msg.sender, paymentRequired);
     }
 
-    if(_furnitures[id].mustSaveFirstBuyer){
+    if(_furnitures[id].saveFirstBuyerMaxTimestampAllowed > 0 && block.timestamp < _furnitures[id].saveFirstBuyerMaxTimestampAllowed){
       _furnituresBought[msg.sender] += amount;
     }
 
@@ -108,7 +108,7 @@ contract IsotileFurniture is ERC1155, ERC1155Pausable, Ownable {
 
       require(amount > 0, "amount cannot be 0");
 
-      if(_furnitures[id].mustSaveFirstBuyer){
+      if(_furnitures[id].saveFirstBuyerMaxTimestampAllowed > 0 && block.timestamp < _furnitures[id].saveFirstBuyerMaxTimestampAllowed){
         totalAmounts += amount;
       }
 
@@ -142,7 +142,7 @@ contract IsotileFurniture is ERC1155, ERC1155Pausable, Ownable {
   }
 
   // Create a furniture
-  function addFurniture(string memory _furnitureUri, uint256 _maxSupply, bool _isPaidWithEther, uint256 _price, bool _mustSaveFirstBuyer) onlyOwner public {
+  function addFurniture(string memory _furnitureUri, uint256 _maxSupply, bool _isPaidWithEther, uint256 _price, uint256 _saveFirstBuyerMaxTimestampAllowed) onlyOwner public {
     uint256 newFurnitureId = _furnitureIds.current();
 
     _furnitures[newFurnitureId] = Furniture({
@@ -151,7 +151,7 @@ contract IsotileFurniture is ERC1155, ERC1155Pausable, Ownable {
       isPaidWithEther: _isPaidWithEther,
       price: _price,
       totalSupply: 0,
-      mustSaveFirstBuyer: _mustSaveFirstBuyer
+      saveFirstBuyerMaxTimestampAllowed: _saveFirstBuyerMaxTimestampAllowed
     });
     
     emit FurnitureAdded(newFurnitureId);

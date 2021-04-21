@@ -1,0 +1,10 @@
+{
+  "name": "Ethereum Trophy",
+  "description": "It is one of the first trophies created in isotile with only 333 units in existence. It represents the end of traditional finance and the power of decentralization to make the world a fairer place.",
+  "image": "ipfs://QmeoThtNcrqQjxYV5WgCZokB2oq2ja1hxSTRJ5Dn7bSh8t",
+  "external_url": "https://isotile.com",
+  "attributes": [{
+      "trait_type": "Rarity", 
+      "value": "Megarare"
+    }]
+}

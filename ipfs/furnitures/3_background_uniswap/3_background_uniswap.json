@@ -1,0 +1,10 @@
+{
+  "name": "Uniswap Background",
+  "description": "It is the first background in isotile with only 500 units in existence. It represents the end of usurious middlemen, giving power back to the users.",
+  "image": "ipfs://QmYMQvwNLcfvpqp4JjZFFCGZ4BsJUg42BSJ8xQgSSHMSGn",
+  "external_url": "https://isotile.com",
+  "attributes": [{
+      "trait_type": "Rarity", 
+      "value": "Megarare"
+    }]
+}
