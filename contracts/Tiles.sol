@@ -1,5 +1,9 @@
 // SPDX-License-Identifier: BUSL-1.1
 
+/*
+    This is just a concept, not already published and will be modified
+*/
+
 pragma solidity ^0.8.0;
 
 import "./IIsotileFurniture.sol";
