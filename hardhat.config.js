@@ -2,6 +2,7 @@
   Verify on Etherscan
 */
 
+require("dotenv").config();
 require('@nomiclabs/hardhat-ethers');
 require("@nomiclabs/hardhat-etherscan");
 
