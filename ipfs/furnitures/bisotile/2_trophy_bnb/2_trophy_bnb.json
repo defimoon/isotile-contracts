@@ -1,0 +1,10 @@
+{
+  "name": "BNB Trophy",
+  "description": "It is one of the first NFT trophies created in bisotile with only 1500 units in existence. It represents the official cryptocurrency of Binance.",
+  "image": "ipfs://Qmdx7oNkzrha4HwWMeNocqEGYKzagY5DqoQJXQxg2RhwxG",
+  "external_url": "https://bisotile.com",
+  "attributes": [{
+      "trait_type": "Rarity", 
+      "value": "Megarare"
+    }]
+}

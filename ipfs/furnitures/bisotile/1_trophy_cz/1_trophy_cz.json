@@ -1,0 +1,10 @@
+{
+  "name": "CZ Marble Sculpture",
+  "description": "It is the first NFT marble sculpture created in bisotile with only 1500 units in existence. It represents one of the most important personalities in the crypto world.",
+  "image": "ipfs://QmZGGJWszDQoyfdkDQ4KKp41P8YskeazssWEwYrHNbMANR",
+  "external_url": "https://bisotile.com",
+  "attributes": [{
+      "trait_type": "Rarity", 
+      "value": "Megarare"
+    }]
+}

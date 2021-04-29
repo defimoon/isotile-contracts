@@ -1,0 +1,10 @@
+{
+  "name": "Doge Trophy",
+  "description": "It is one of the first NFT trophies created in bisotile with only 1500 units in existence. It represents the currency of the people fighting against boomer assets.",
+  "image": "ipfs://QmZdshghnkesU3hgZ3Ejqz9aR9xFVsfMJp8ruu8k22GJgG",
+  "external_url": "https://bisotile.com",
+  "attributes": [{
+      "trait_type": "Rarity", 
+      "value": "Megarare"
+    }]
+}

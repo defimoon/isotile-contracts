@@ -1,0 +1,10 @@
+{
+  "name": "CZ Spacecraft Background",
+  "description": "It is the first NFT background created in bisotile with only 1500 units in existence. It represents the popular saying of 'Funds are safu'.",
+  "image": "ipfs://QmPHN4kz2f7DquPzpiK5RWLVw1ygvgjadwZ3GDfgkDrGQT",
+  "external_url": "https://bisotile.com",
+  "attributes": [{
+      "trait_type": "Rarity", 
+      "value": "Megarare"
+    }]
+}
