@@ -1,0 +1,10 @@
+{
+    "name": "Background: Flowers",
+    "description": "It is composed of different varieties of flowers.",
+    "image": "ipfs://QmUx19iZqWMEyZDebmGfEGAVtzunXWVa3krZYHZouyC29T",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }

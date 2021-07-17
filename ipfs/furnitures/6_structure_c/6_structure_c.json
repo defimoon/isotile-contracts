@@ -1,0 +1,10 @@
+{
+    "name": "Structure: C",
+    "description": "Structure C is composed of 65 tiles and 2 walls.",
+    "image": "ipfs://QmQGMnevCJCXyYEGRDvDtmCy6ABQny9HVZKn9LPuUk4STS",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }

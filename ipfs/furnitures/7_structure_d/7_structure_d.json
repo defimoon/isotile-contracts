@@ -1,0 +1,10 @@
+{
+    "name": "Structure: D",
+    "description": "Structure D is composed of 121 tiles and 2 walls.",
+    "image": "ipfs://QmNa99xXjVstibqVW5R7AQZbAZCafo882Rsw9hGkrxyoMK",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }

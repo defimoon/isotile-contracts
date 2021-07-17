@@ -1,0 +1,10 @@
+{
+    "name": "Structure: E",
+    "description": "Structure E is composed of 116 tiles and 4 walls.",
+    "image": "ipfs://QmNS5WzTQBaw3iRgiaQHbjBFpG7fqbLCUiW4MFVj9duELV",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }

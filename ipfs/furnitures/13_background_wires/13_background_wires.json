@@ -1,0 +1,10 @@
+{
+    "name": "Background: Wires",
+    "description": "It is composed of the wires that tie together Ethereum's decentralized ecosystem.",
+    "image": "ipfs://QmaHoNbNE2fCygvFNK98mZXt9RMLMyUhAurJYiniqWRz62",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }

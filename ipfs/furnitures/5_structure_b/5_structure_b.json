@@ -1,0 +1,10 @@
+{
+    "name": "Structure: B",
+    "description": "Structure B is composed of 56 tiles and 6 walls.",
+    "image": "ipfs://QmY1ABxEVdUpFs454g8EwSxF9uGnjhTHKKWfpbrV6Ffe9w",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }

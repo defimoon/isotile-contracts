@@ -1,0 +1,10 @@
+{
+    "name": "Background: Space",
+    "description": "It is composed of stars and nebulae.",
+    "image": "ipfs://QmWx7kot8wyqQ2ouxqo2oHUHXA43Twxa5aBkRFhkxAdbjD",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }

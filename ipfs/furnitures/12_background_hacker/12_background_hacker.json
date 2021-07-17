@@ -1,0 +1,10 @@
+{
+    "name": "Background: Hacker",
+    "description": "It is composed of binary code from the Ethereum Virtual Machine.",
+    "image": "ipfs://QmWzaN4sEvVD9CN7vB6egdYjfdt9LodkZy5iZ9W6WLFd34",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }

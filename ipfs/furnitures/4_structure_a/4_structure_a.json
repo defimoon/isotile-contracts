@@ -1,0 +1,10 @@
+{
+    "name": "Structure: A",
+    "description": "Structure A is composed of 51 tiles and 4 walls.",
+    "image": "ipfs://QmNjiPNHGWamBXvvUHhPgXXR3NGkQrWZ66v6jtCH55oRpo",
+    "external_url": "https://isotile.com",
+    "attributes": [{
+        "trait_type": "Rarity", 
+        "value": "Common"
+      }]
+  }
