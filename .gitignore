@@ -1,6 +1,7 @@
 node_modules
 *.env
 node_modules
+contracts/examples
 
 #Hardhat files
 cache
