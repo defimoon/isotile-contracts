@@ -67,7 +67,7 @@ contract StakingFirstPhase is Ownable, ReentrancyGuard, ERC1155Holder {
 
         uint256 avatarsLength = avatarIds.length;
         for(uint256 i = 0; i < avatarsLength;) {
-            avatarContract.safeTransferFrom(address(this), _msgSender(), avatarIds[i]);
+            avatarContract.transferFrom(address(this), _msgSender(), avatarIds[i]);
 
             unchecked {
                 i++;
