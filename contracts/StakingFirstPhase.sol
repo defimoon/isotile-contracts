@@ -7,9 +7,8 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC1155/IERC1155.sol";
 import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract StakingFirstPhase is Ownable, ReentrancyGuard, ERC1155Holder {
+contract StakingFirstPhase is Ownable, ERC1155Holder {
     IERC721 private avatarContract = IERC721(0x31eAa2E93D7AFd237F87F30c0Dbd3aDEB9934f1B);
     IERC1155 private furnitureContract = IERC1155(0xb644476e44A797Db3B8a6A16f2e63e8D5a541b67);
 
@@ -24,8 +23,13 @@ contract StakingFirstPhase is Ownable, ReentrancyGuard, ERC1155Holder {
     
     constructor() {}
     
-    function stake(uint256[] calldata avatarIds, uint256[] calldata furnitureIds, uint256[] calldata furnitureAmounts) external nonReentrant {
+    function stake(uint256[] calldata avatarIds, uint256[] calldata furnitureIds, uint256[] calldata furnitureAmounts) external {
         require(canStake, "You can not stake anymore");
+
+        bytes32 proof = keccak256(abi.encode(_msgSender(), avatarIds, furnitureIds, furnitureAmounts));
+        require(!proofs[proof], "No reentrancy attacks allowed");
+
+        proofs[proof] = true;
 
         uint256 earnedTickets;
 
@@ -34,7 +38,7 @@ contract StakingFirstPhase is Ownable, ReentrancyGuard, ERC1155Holder {
             avatarContract.transferFrom(_msgSender(), address(this), avatarIds[earnedTickets]);
 
             unchecked {
-                earnedTickets++;
+                ++earnedTickets;
             }
         }
 
@@ -51,9 +55,6 @@ contract StakingFirstPhase is Ownable, ReentrancyGuard, ERC1155Holder {
             }
         }
 
-        bytes32 proof = keccak256(abi.encode(_msgSender(), avatarIds, furnitureIds, furnitureAmounts));
-        proofs[proof] = true;
-
         unchecked {
             tickets[_msgSender()] += earnedTickets;
             totalTickets += earnedTickets;
@@ -62,15 +63,20 @@ contract StakingFirstPhase is Ownable, ReentrancyGuard, ERC1155Holder {
         emit Stake(_msgSender(), avatarIds, furnitureIds, furnitureAmounts);
     }
 
-    function unstake(uint256[] calldata avatarIds, uint256[] calldata furnitureIds, uint256[] calldata furnitureAmounts) external nonReentrant {
+    function unstake(uint256[] calldata avatarIds, uint256[] calldata furnitureIds, uint256[] calldata furnitureAmounts) external {
         require(!canStake, "You can not unstake while staking happens");
+
+        bytes32 proof = keccak256(abi.encode(_msgSender(), avatarIds, furnitureIds, furnitureAmounts));
+        require(proofs[proof], "Proof does not exist");
+
+        delete proofs[proof];
 
         uint256 avatarsLength = avatarIds.length;
         for(uint256 i = 0; i < avatarsLength;) {
             avatarContract.transferFrom(address(this), _msgSender(), avatarIds[i]);
 
             unchecked {
-                i++;
+                ++i;
             }
         }
 
@@ -78,11 +84,6 @@ contract StakingFirstPhase is Ownable, ReentrancyGuard, ERC1155Holder {
         if(furnitureLength > 0){
             furnitureContract.safeBatchTransferFrom(address(this), _msgSender(), furnitureIds, furnitureAmounts, "");
         }
-
-        bytes32 proof = keccak256(abi.encode(_msgSender(), avatarIds, furnitureIds, furnitureAmounts));
-        require(proofs[proof], "Proof does not exist");
-
-        delete proofs[proof];
 
         emit Unstake(_msgSender(), avatarIds, furnitureIds, furnitureAmounts);
     }
