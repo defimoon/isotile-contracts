@@ -12,11 +12,11 @@ contract StakingFirstPhase is Ownable, ERC1155Holder {
     IERC721 private avatarContract = IERC721(0x31eAa2E93D7AFd237F87F30c0Dbd3aDEB9934f1B);
     IERC1155 private furnitureContract = IERC1155(0xb644476e44A797Db3B8a6A16f2e63e8D5a541b67);
 
-    uint256 private totalTickets;
-    mapping (bytes32 => bool) private proofs;
-    mapping (address => uint256) private tickets;
-
-    bool private canStake = true;
+    mapping (bytes32 => bool) public proofs;
+    mapping (address => uint256) public tickets;
+    uint256 public totalTickets;
+    bool public stakingEnabled = true;
+    bool public unstakingEnabled = false;
 
     event Stake(address indexed userAddress, uint256[] avatarIds, uint256[] furnitureIds, uint256[] furnitureAmounts);
     event Unstake(address indexed userAddress, uint256[] avatarIds, uint256[] furnitureIds, uint256[] furnitureAmounts);
@@ -24,7 +24,7 @@ contract StakingFirstPhase is Ownable, ERC1155Holder {
     constructor() {}
     
     function stake(uint256[] calldata avatarIds, uint256[] calldata furnitureIds, uint256[] calldata furnitureAmounts) external {
-        require(canStake, "You can not stake anymore");
+        require(stakingEnabled, "Staking is disabled");
 
         bytes32 proof = keccak256(abi.encode(_msgSender(), avatarIds, furnitureIds, furnitureAmounts));
         require(!proofs[proof], "No reentrancy attacks allowed");
@@ -64,7 +64,7 @@ contract StakingFirstPhase is Ownable, ERC1155Holder {
     }
 
     function unstake(uint256[] calldata avatarIds, uint256[] calldata furnitureIds, uint256[] calldata furnitureAmounts) external {
-        require(!canStake, "You can not unstake while staking happens");
+        require(unstakingEnabled, "Unstaking is disabled");
 
         bytes32 proof = keccak256(abi.encode(_msgSender(), avatarIds, furnitureIds, furnitureAmounts));
         require(proofs[proof], "Proof does not exist");
@@ -88,20 +88,22 @@ contract StakingFirstPhase is Ownable, ERC1155Holder {
         emit Unstake(_msgSender(), avatarIds, furnitureIds, furnitureAmounts);
     }
 
-    function getTickets(address userAddress) external view returns(uint256) {
-        return tickets[userAddress];
+    function enableStaking() external onlyOwner {
+        require(!unstakingEnabled, "First disable unstaking");
+        stakingEnabled = true;
     }
 
-    function getTotalTickets() external view returns(uint256) {
-        return totalTickets;
+    function disableStaking() external onlyOwner {
+        stakingEnabled = false;
     }
 
-    function isStakingEnabled() external view returns (bool) {
-        return canStake;
+    function enableUnstaking() external onlyOwner {
+        require(!stakingEnabled, "First disable staking");
+        unstakingEnabled = true;
     }
 
-    function endStaking() external onlyOwner {
-        canStake = false;
+    function disableUnstaking() external onlyOwner {
+        unstakingEnabled = false;
     }
 
 }

@@ -12,6 +12,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.1",
     "@openzeppelin/contracts": "^4.1.0-rc.0",
+    "erc721a": "^3.1.0",
     "hardhat": "^2.2.0"
   },
   "scripts": {
