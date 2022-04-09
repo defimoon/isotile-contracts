@@ -10,8 +10,8 @@ import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
 
 contract Staking is Ownable, ERC1155Holder {
     IERC721 private landContract;
-    IERC721 private avatarContract = IERC721(0xdf55e9029D42d64186Ea38Cc24635695cf841457);
-    IERC1155 private furnitureContract = IERC1155(0x5fb735b2468d8c5De1B714b310a96C24C667111d);
+    IERC721 private avatarContract = IERC721(0x31eAa2E93D7AFd237F87F30c0Dbd3aDEB9934f1B);
+    IERC1155 private furnitureContract = IERC1155(0xb644476e44A797Db3B8a6A16f2e63e8D5a541b67);
 
     mapping (bytes32 => bool) public proofs;
     mapping (address => uint256) public tickets;
