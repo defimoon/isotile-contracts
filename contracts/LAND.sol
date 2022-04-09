@@ -5,7 +5,7 @@ pragma solidity ^0.8.4;
 import "erc721a/contracts/extensions/ERC721APausable.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./IStakingFirstPhase.sol";
+import "./IStaking.sol";
 
 contract LAND is ERC721APausable, Ownable {
     // Metadata
@@ -14,21 +14,21 @@ contract LAND is ERC721APausable, Ownable {
     string private _baseTokenURI = "https://cloud.isotile.com/"; // TODO: Modify
     string private _name = "isotile Genesis LAND";
     string private _symbol = "LAND";
-    uint256 private _price = 0.029 ether; // TODO: Modify
+    uint256 private _price = 0.001 ether; // TODO: Modify
     uint256 private _maxSupply = 100; // TODO: Modify
-    uint256 private _maxSupplyForMint = 20;
+    uint256 private _maxSupplyForMint = 75;
 
     // PHASE 1: Whitelist
-    bytes32 private _merkleRoot = 0xe9057a631b49d54543ec6a34551af283e18096405d026d4453a5b3367cc8c179; // TODO: Modify
+    bytes32 private _merkleRoot = 0x79ddf08365fc8d14ac7aed077f551f29de34d1a2cb8667ce686d3ded491b345e; // TODO: Modify
     mapping(uint256 => uint256) private _whitelists;
 
     // PHASE 2: Minting
     bool private _allowPublicMint = false;
-    uint256 private _maxMintPerTx = 5;
+    uint256 private _maxMintPerTx = 50;
 
     // PHASE 3: Stake
     bool private _allowStakingMint = false;
-    IStakingFirstPhase private _stakingInstance = IStakingFirstPhase(0x4bf8bE3314E6a6cAd35626cdA689b83F2aE38864); // TODO: Modify
+    IStaking private _stakingInstance = IStaking(0xCFB275c51ffdd6801a17086a67f8b96E577b8Ba2); // TODO: Modify
     mapping (address => bool) private _stakers;
 
     constructor() ERC721A(_name, _symbol) {}
@@ -94,7 +94,7 @@ contract LAND is ERC721APausable, Ownable {
         require(_allowStakingMint, "Staking minting didnt start");
         require(!_stakers[_msgSender()], "You already minted by staking");
         
-        uint256 tickets = _stakingInstance.getTickets(_msgSender());
+        uint256 tickets = _stakingInstance.tickets(_msgSender());
         require(tickets > 0, "You have no staking tickets");
         require(totalSupply() + tickets <= _maxSupply, "Exceeds maximum LAND supply");
 
