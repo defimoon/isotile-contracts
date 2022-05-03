@@ -9,37 +9,60 @@ import "./IStaking.sol";
 
 contract LAND is ERC721APausable, Ownable {
     // Metadata
-    string public constant PROVENANCE_SHA1 = "3b2aaeee939ebd5b41866075662819dce7bdcd3f"; // TODO: Modify
+    string public constant PROVENANCE_SHA1 = "ba3a6eb897fbb146b77ec32c73a712a4066d4a50";
 
-    string private _baseTokenURI = "https://cloud.isotile.com/"; // TODO: Modify
+    string private _baseTokenURI = "https://cloud-01.isotile.com/basic/land/unrevealed/json/";
     string private _name = "isotile Genesis LAND";
     string private _symbol = "LAND";
-    uint256 private _price = 0.001 ether; // TODO: Modify
-    uint256 private _maxSupply = 100; // TODO: Modify
-    uint256 private _maxSupplyForMint = 75;
+    uint256 private constant RESERVED_LAND = 50;
+    uint256 public price = 0.059 ether;
 
     // PHASE 1: Whitelist
-    bytes32 private _merkleRoot = 0x79ddf08365fc8d14ac7aed077f551f29de34d1a2cb8667ce686d3ded491b345e; // TODO: Modify
+    bytes32 private _merkleRoot = 0xd7cddc2efbdd756f6cb18957deed6634825004002304cc89cfb6f4b56c8d05f2;
     mapping(uint256 => uint256) private _whitelists;
 
     // PHASE 2: Minting
+    uint256 public currentMintingId;
+    uint256 private _maxSupplyForMinting = 1438;
     bool private _allowPublicMint = false;
-    uint256 private _maxMintPerTx = 50;
+    uint256 private _maxMintPerTx = 5;
 
     // PHASE 3: Stake
+    uint256 public currentStakingId;
+    uint256 private _maxSupplyForStaking = 4491;
     bool private _allowStakingMint = false;
-    IStaking private _stakingInstance = IStaking(0xCFB275c51ffdd6801a17086a67f8b96E577b8Ba2); // TODO: Modify
+    IStaking private _stakingInstance = IStaking(0x073a5c788eb3B3Ff72d17f6a9eDd29C50586c776);
     mapping (address => bool) private _stakers;
 
-    constructor() ERC721A(_name, _symbol) {}
+    constructor() ERC721A(_name, _symbol) {
+        currentMintingId += RESERVED_LAND;
+        _mint(_msgSender(), RESERVED_LAND, "", false);
+    }
+
+    modifier callerIsUser() {
+        require(tx.origin == msg.sender, "Caller must be user");
+        _;
+    }
     
-    function mintChecks(uint256 num) private {
+    function mintTo(address account, uint256 num) private {
         require(num > 0, "You cant mint negative LAND");
         require(num <= _maxMintPerTx, "You can mint max 5 LAND per tx");
-        require(totalSupply() + num <= _maxSupplyForMint, "Exceeds maximum LAND supply");
-        require(msg.value == _price * num, "Ether sent is not correct");
+        require(currentMintingId + num <= _maxSupplyForMinting, "Exceeds maximum LAND supply");
         
-        _mint(_msgSender(), num, "", false);
+        currentMintingId += num;
+        _mint(account, num, "", false);
+    }
+
+    function stakingMintTo(address account) private {
+        require(!_stakers[account], "You already minted by staking");
+        _stakers[account] = true;
+
+        uint256 tickets = _stakingInstance.tickets(account);
+        require(tickets > 0, "You have no staking tickets");
+        require(currentStakingId + tickets <= _maxSupplyForStaking, "Exceeds maximum LAND supply");
+
+        currentStakingId += tickets;
+        _mint(account, tickets, "", false);
     }
 
     function isClaimedWhitelist(uint256 index) private view returns (bool) {
@@ -51,7 +74,7 @@ contract LAND is ERC721APausable, Ownable {
         return claimedWord & mask == mask;
     }
 
-    function _setClaimedWhitelist(uint256 index) private {
+    function setClaimedWhitelist(uint256 index) private {
         uint256 claimedWordIndex = index / 256;
         uint256 claimedBitIndex = index % 256;
         _whitelists[claimedWordIndex] = _whitelists[claimedWordIndex] | (1 << claimedBitIndex);
@@ -69,45 +92,38 @@ contract LAND is ERC721APausable, Ownable {
         return _symbol;
     }
 
-    function getPrice() external view returns (uint256){
-        return _price;
-    }
-
     function whitelistMint(uint256 index, uint256 num, bytes32[] calldata merkleProof) external payable {
         require(!isClaimedWhitelist(index), "Whitelist already claimed");
+        require(msg.value == price * num, "Ether sent is not correct");
 
         bytes32 node = keccak256(abi.encodePacked(index, _msgSender(), num));
         require(MerkleProof.verify(merkleProof, _merkleRoot, node), "Invalid proof");
 
-        _setClaimedWhitelist(index);
+        setClaimedWhitelist(index);
 
-        mintChecks(num);
+        mintTo(_msgSender(), num);
     }
 
-    function publicMint(uint256 num) external payable {
+    function publicMint(uint256 num) callerIsUser external payable {
         require(_allowPublicMint, "Public minting didnt start");
+        require(msg.value == price * num, "Ether sent is not correct");
 
-        mintChecks(num);
+        mintTo(_msgSender(), num);
     }
 
     function stakingMint() external {
         require(_allowStakingMint, "Staking minting didnt start");
-        require(!_stakers[_msgSender()], "You already minted by staking");
         
-        uint256 tickets = _stakingInstance.tickets(_msgSender());
-        require(tickets > 0, "You have no staking tickets");
-        require(totalSupply() + tickets <= _maxSupply, "Exceeds maximum LAND supply");
-
-        _stakers[_msgSender()] = true;
-
-        _mint(_msgSender(), tickets, "", false);
+        stakingMintTo(_msgSender());
+    }
+    
+    /* onlyOwner */
+    function publicMintAdmin(address account, uint256 num) onlyOwner external {
+        mintTo(account, num);
     }
 
-    function adminMint(address receiver, uint256 tickets) onlyOwner external {
-        require(tickets > 0, "Tickets should be positive");
-        require(totalSupply() + tickets <= _maxSupply, "Exceeds maximum LAND supply");
-
-        _mint(receiver, tickets, "", false);
+    function stakingMintAdmin(address account) onlyOwner external {
+        stakingMintTo(account);
     }
 
     function setMerkleRoot(bytes32 merkleRoot) onlyOwner external {
@@ -118,8 +134,8 @@ contract LAND is ERC721APausable, Ownable {
         _baseTokenURI = baseURI;
     }
     
-    function setPrice(uint256 price) onlyOwner external {
-        _price = price;
+    function setPrice(uint256 price_) onlyOwner external {
+        price = price_;
     }
     
     function setName(string memory name_) onlyOwner external {
@@ -130,12 +146,32 @@ contract LAND is ERC721APausable, Ownable {
         _symbol = symbol_;
     }
 
+    function stopPublicMint() onlyOwner external {
+        _allowPublicMint = false;
+    }
+
     function startPublicMint() onlyOwner external {
         _allowPublicMint = true;
     }
 
+    function stopStakingMint() onlyOwner external {
+        _allowStakingMint = false;
+    }
+
     function startStakingMint() onlyOwner external {
         _allowStakingMint = true;
+    }
+
+    function setMaxSupplyForMinting(uint256 maxSupplyForMinting) onlyOwner external {
+        require(maxSupplyForMinting < _maxSupplyForMinting, "Can not increase supply");
+
+        _maxSupplyForMinting = maxSupplyForMinting;
+    }
+
+    function setMaxSupplyForStaking(uint256 maxSupplyForStaking) onlyOwner external {
+        require(maxSupplyForStaking < _maxSupplyForStaking, "Can not increase supply");
+
+        _maxSupplyForStaking = maxSupplyForStaking;
     }
 
     function pause() onlyOwner external {
